@@ -13,7 +13,8 @@ if (CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif ()
 
 
-find_package(ament_cmake_ros REQUIRED)
+find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_gmock REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(aws_common REQUIRED)
 find_package(aws_ros2_common REQUIRED)
@@ -54,12 +55,14 @@ ament_target_dependencies(${HEALTH_METRIC_COLLECTOR_LIBRARY_TARGET}
 
 add_executable(${PROJECT_NAME} src/collector.cpp)
 
-target_link_libraries(${PROJECT_NAME}
+set(LIB_DEPS
         ${rclcpp_LIBRARIES}
         ${aws_common_LIBRARIES}
         ${aws_ros2_common_LIBRARIES}
         ${ros_monitoring_msgs_LIBRARIES}
-        )
+)
+
+target_link_libraries(${PROJECT_NAME} ${LIB_DEPS})
 
 ament_target_dependencies(${PROJECT_NAME} ${HEALTH_METRIC_COLLECTOR_LIBRARY_TARGET})
 
@@ -88,5 +91,18 @@ install(
 ### Mark other files for installation (e.g. launch and bag files, etc.)
 install(DIRECTORY launch/ DESTINATION share/${PROJECT_NAME}/launch)
 install(DIRECTORY config/ DESTINATION share/${PROJECT_NAME}/config)
+
+#############
+## Tests ##
+#############
+
+ament_add_gmock(test_health_metric_collector
+  test/health_metric_collector_test.cpp)
+target_include_directories(test_health_metric_collector
+  PRIVATE include)
+target_link_libraries(test_health_metric_collector
+        ${HEALTH_METRIC_COLLECTOR_LIBRARY_TARGET}
+        ${LIB_DEPS})
+
 
 ament_package()

@@ -20,6 +20,8 @@
   <exec_depend>ros_monitoring_msgs</exec_depend>
   <exec_depend>aws_common</exec_depend>
 
+  <test_depend>ament_cmake_gmock</test_depend>
+
   <export>
     <build_type>ament_cmake</build_type>
   </export>
